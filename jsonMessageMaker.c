@@ -12,7 +12,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "cjson/cJSON.h"
+#include <cjson/cJSON.h>
 #include "libepsolar.h"
 
 
