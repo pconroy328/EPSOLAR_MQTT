@@ -94,9 +94,9 @@ char *realTimeDataToJSON (const char *topic, const const epsolarRealTimeData_t *
     cJSON_AddNumberToObject( message, "batteryMaxVoltage", FP22P( rtData->batteryMaxVoltage ) );
     cJSON_AddNumberToObject( message, "batteryMinVoltage", FP22P( rtData->batteryMinVoltage ) );
     cJSON_AddStringToObject( message, "batteryChargingStatus", rtData->batteryChargingStatus );
-    cJSON_AddNumberToObject( message, "batteryTemperature", FP22P( rtData->batteryTemperature ) );
+    cJSON_AddNumberToObject( message, "batteryTemperature", FP21P( rtData->batteryTemperature ) );
     
-    cJSON_AddNumberToObject( message, "controllerTemperature", FP22P( rtData->controllerTemp ) );
+    cJSON_AddNumberToObject( message, "controllerTemperature", FP21P( rtData->controllerTemp ) );
     cJSON_AddStringToObject( message, "chargerStatusNormal", (rtData->chargerStatusNormal ? "Yes" : "No" ));
     cJSON_AddStringToObject( message, "chargerRunning", (rtData->chargerRunning ? "Yes" : "No" ));
     cJSON_AddNumberToObject( message, "deviceArrayChargingStatusBits", rtData->controllerStatusBits );
