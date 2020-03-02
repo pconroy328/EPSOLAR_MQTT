@@ -1,0 +1,25 @@
+[Unit]
+Description=EPSOLAR SCC to MQTT
+After=syslog.target
+
+[Service]
+Type=simple
+User=pconroy
+Group=pconroy
+WorkingDirectory=/home/pconroy/EPSOLAR_MQTT
+ExecStart=/home/pconroy/EPSOLAR_MQTT/dist/Debug/GNU-Linux/epsolar_mqtt -s 60 -v 5 -i 1
+StandardOutput=null
+StandardError=null
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=default.target
+
+#
+# After this the steps are:
+# Create the unit file in /etc/systemd/system (the file name before .service will be the name you call to start/stop/restart the service)
+# Set file permissions to 644
+# Tell systemd that there is a new unit file: systemctl daemon-reload
+# Start service: systemctl start <service>
+# Check the service status: systemctl status <service>
