@@ -84,6 +84,8 @@ char *realTimeDataToJSON (const char *topic, const const epsolarRealTimeData_t *
     cJSON_AddNumberToObject( message, "loadVoltage", FP22P( rtData->loadVoltage ) );
     cJSON_AddNumberToObject( message, "loadCurrent", FP22P( rtData->loadCurrent ) );
     cJSON_AddNumberToObject( message, "loadPower", FP22P( rtData->loadPower ) );
+    cJSON_AddStringToObject( message, "loadLevel", rtData->loadLevel );
+    cJSON_AddStringToObject( message, "loadControlMode", rtData->loadControlMode );
 
     cJSON_AddNumberToObject( message, "batterySOC", rtData->batteryStateOfCharge );
     cJSON_AddNumberToObject( message, "batteryVoltage", FP22P( rtData->batteryVoltage ) );
@@ -95,8 +97,9 @@ char *realTimeDataToJSON (const char *topic, const const epsolarRealTimeData_t *
     cJSON_AddNumberToObject( message, "batteryTemperature", FP22P( rtData->batteryTemperature ) );
     
     cJSON_AddNumberToObject( message, "controllerTemperature", FP22P( rtData->controllerTemp ) );
-    cJSON_AddStringToObject( message, "controllerStatus", rtData->controllerStatus );
-    cJSON_AddNumberToObject( message, "controllerStatusBits", rtData->controllerStatusBits );
+    cJSON_AddStringToObject( message, "chargerStatusNormal", (rtData->chargerStatusNormal ? "Yes" : "No" ));
+    cJSON_AddStringToObject( message, "chargerRunner", (rtData->chargerRunning ? "Yes" : "No" ));
+    cJSON_AddNumberToObject( message, "deviceArrayChargingStatusBits", rtData->controllerStatusBits );
     
     cJSON_AddNumberToObject( message, "energyConsumedToday", FP22P( rtData->energyConsumedToday ) );
     cJSON_AddNumberToObject( message, "energyConsumedMonth", FP22P( rtData->energyConsumedMonth ) );
