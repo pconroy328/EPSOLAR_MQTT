@@ -74,7 +74,7 @@ int main (int argc, char* argv[])
 
     //
     struct mosquitto *aMosquittoInstance;
-    MQTT_ConnectRV( &aMosquittoInstance );
+    MQTT_ConnectRV( &aMosquittoInstance, 60 );
     
 #if 0    
     //
