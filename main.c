@@ -25,7 +25,7 @@
 
 
 
-static  char    *version = "EPSOLAR_MQTT SCC Data Publisher - version 0.1";
+static  char    *version = "EPSOLAR_MQTT SCC Data Publisher - version 0.2 (direct connect to broker]";
 
 
 static  int     sleepSeconds = 60;                  // How often to send out SCC data packets
