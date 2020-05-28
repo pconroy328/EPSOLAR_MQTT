@@ -79,7 +79,7 @@ int main (int argc, char* argv[])
         Logger_LogWarning( "No MQTT Broker host passed in on command line - trying mDNS to locate broker.\n" );
         MQTT_ConnectRV( &aMosquittoInstance, 60 );
     } else {
-        Logger_LogWarning( "MQTT Broker host (%s) passed in on command line. Looking for JUST THAT ONE\n.", brokerHostName );
+        Logger_LogWarning( "MQTT Broker host (%s) passed in on command line. Looking for JUST THAT ONE\n.", brokerHost );
         if (!MQTT_Connect( brokerHost, &aMosquittoInstance, FALSE, 60 )) {
             Logger_LogFatal( "Unable to find a broker by that name [%s] - we will exit.\n", brokerHost );
         }
