@@ -30,6 +30,7 @@ static  char    *version = "EPSOLAR_MQTT SCC Data Publisher - version 0.1";
 
 static  int     sleepSeconds = 60;                  // How often to send out SCC data packets
 static  char    *brokerHost = "mqttrv.local";       // default address of our MQTT broker
+static  int     passedInBrokerHost = FALSE;         // TRUE if they passed it in via the command line
 static  int     loggingLevel = 3;
 
 static  char    *topTopic = "SCC";                  // MQTT top level topic
@@ -74,7 +75,15 @@ int main (int argc, char* argv[])
 
     //
     struct mosquitto *aMosquittoInstance;
-    MQTT_ConnectRV( &aMosquittoInstance, 60 );
+    if (!passedInBrokerHost) {
+        Logger_LogWarning( "No MQTT Broker host passed in on command line - trying mDNS to locate broker.\n" );
+        MQTT_ConnectRV( &aMosquittoInstance, 60 );
+    } else {
+        Logger_LogWarning( "MQTT Broker host (%s) passed in on command line. Looking for JUST THAT ONE\n.", brokerHostName );
+        if (!MQTT_Connect( brokerHost, &aMosquittoInstance, FALSE, 60 )) {
+            Logger_LogFatal( "Unable to find a broker by that name [%s] - we will exit.\n", brokerHost );
+        }
+    }
     
 #if 0    
     //
@@ -95,7 +104,7 @@ int main (int argc, char* argv[])
     
     snprintf( subscriptionTopic, sizeof subscriptionTopic, "%s/%d/%s", topTopic, controllerID, "COMMAND" );
     Logger_LogWarning( "Subscribing to commands on MQTT Topic [%s]\n", subscriptionTopic );
-    MQTT_Subscribe ( aMosquittoInstance, subscriptionTopic, 0 );
+    MQTT_Subscribe( aMosquittoInstance, subscriptionTopic, 0 );
 
         
     //
@@ -171,7 +180,10 @@ void    parseCommandLine (int argc, char *argv[])
     
     while (((c = getopt( argc, argv, "h:t:s:i:p:v:j" )) != -1) && (c != 255)) {
         switch (c) {
-            case 'h':   brokerHost = optarg;            break;
+            case 'h':   brokerHost = optarg;
+                        passedInBrokerHost = TRUE;
+                        break;
+                        
             case 's':   sleepSeconds = atoi( optarg );  break;
             case 't':   topTopic = optarg;              break;
             case 'i':   controllerID = atoi( optarg );  break;
