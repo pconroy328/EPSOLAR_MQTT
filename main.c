@@ -80,7 +80,7 @@ int main (int argc, char* argv[])
         MQTT_ConnectRV( &aMosquittoInstance, 60 );
     } else {
         Logger_LogWarning( "MQTT Broker host (%s) passed in on command line. Looking for JUST THAT ONE\n.", brokerHost );
-        if (!MQTT_Connect( brokerHost, &aMosquittoInstance, FALSE, 60 )) {
+        if (!MQTT_Initialize( brokerHost, 1883, &aMosquittoInstance )) {
             Logger_LogFatal( "Unable to find a broker by that name [%s] - we will exit.\n", brokerHost );
         }
     }
