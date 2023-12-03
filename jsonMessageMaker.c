@@ -13,6 +13,7 @@
 #include <time.h>
 
 #include <cjson/cJSON.h>
+#include "log4c.h"
 #include "libepsolar.h"
 
 
@@ -64,7 +65,7 @@ char *realTimeDataToJSON (const char *topic, const const epsolarRealTimeData_t *
     cJSON *message = cJSON_CreateObject();
 
     cJSON_AddStringToObject( message, "topic", topic );
-    cJSON_AddStringToObject( message, "version", "3.0" );
+    cJSON_AddStringToObject( message, "version", "3.1" );
     
     //
     //  cJSON uses a "%1.15g" format for number formatting which means we can get some
@@ -94,9 +95,19 @@ char *realTimeDataToJSON (const char *topic, const const epsolarRealTimeData_t *
     cJSON_AddNumberToObject( message, "batteryMaxVoltage", FP22P( rtData->batteryMaxVoltage ) );
     cJSON_AddNumberToObject( message, "batteryMinVoltage", FP22P( rtData->batteryMinVoltage ) );
     cJSON_AddStringToObject( message, "batteryChargingStatus", rtData->batteryChargingStatus );
-    cJSON_AddNumberToObject( message, "batteryTemperature", FP21P( rtData->batteryTemperature ) );
     
-    cJSON_AddNumberToObject( message, "controllerTemperature", FP21P( rtData->controllerTemp ) );
+    //
+    // Been seeing some spurious values coming thru. We'll ignore them from now on
+    if ( (rtData->batteryTemperature >= -50.0) && (rtData->batteryTemperature <= 150.0))
+        cJSON_AddNumberToObject( message, "batteryTemperature", FP21P( rtData->batteryTemperature ) );
+    else 
+        Logger_LogWarning( "Battery Temperature out of range. Ignoring: %f\n", rtData->batteryTemperature );
+    
+    if ( (rtData->controllerTemp >= -50.0) && (rtData->controllerTemp <= 150.0))
+        cJSON_AddNumberToObject( message, "controllerTemperature", FP21P( rtData->controllerTemp ) );
+    else 
+        Logger_LogWarning( "Controller Temperature out of range. Ignoring: %f\n", rtData->controllerTemp );
+        
     cJSON_AddStringToObject( message, "chargerStatusNormal", (rtData->chargerStatusNormal ? "Yes" : "No" ));
     cJSON_AddStringToObject( message, "chargerRunning", (rtData->chargerRunning ? "Yes" : "No" ));
     cJSON_AddNumberToObject( message, "deviceArrayChargingStatusBits", rtData->controllerStatusBits );
