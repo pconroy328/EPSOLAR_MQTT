@@ -25,7 +25,7 @@
 
 
 
-static  char    *version = "EPSOLAR_MQTT SCC Data Publisher - version 0.3 (min/max error)";
+static  char    *version = "EPSOLAR_MQTT SCC Data Publisher - version 0.9 (unformatted json, extra fields)";
 
 
 static  int     sleepSeconds = 60;                  // How often to send out SCC data packets
@@ -41,6 +41,9 @@ static  int     synchClocks  = TRUE;
 static  int     controllerID = 1;
 static  char    *devicePortName = NULL;
 
+//
+// GLOBAL
+int             sendExtraData = FALSE;
 
 //  
 // Forwards
@@ -176,9 +179,11 @@ void    parseCommandLine (int argc, char *argv[])
     //  -s  N           sleep between sends <seconds>
     //  -i  <string>    give this controller an identifier (defaults to LS1024B_1)
     //  -p  <string>    open this /dev/port to talk to contoller (defaults to /dev/ttyUSB0
+    //  -x              send extra data
+    //  -c              do NOT synch controller clock
     char    c;
     
-    while (((c = getopt( argc, argv, "h:t:s:i:p:v:j" )) != -1) && (c != 255)) {
+    while (((c = getopt( argc, argv, "h:t:s:i:p:v:j:c:x" )) != -1) && (c != 255)) {
         switch (c) {
             case 'h':   brokerHost = optarg;
                         passedInBrokerHost = TRUE;
@@ -190,6 +195,7 @@ void    parseCommandLine (int argc, char *argv[])
             case 'p':   devicePortName = optarg;        break;
             case 'v':   loggingLevel = atoi( optarg );  break;
             case 'c':   synchClocks = FALSE;            break;
+            case 'x':   sendExtraData = TRUE;           break;
             
             default:    showHelp();     break;
         }

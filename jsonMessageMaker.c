@@ -18,6 +18,7 @@
 
 
 extern char    *getCurrentDateTime( void );
+extern  int     sendExtraData;
 
 //
 //  Quickie Macros to control Floating Point Precision
@@ -65,7 +66,7 @@ char *realTimeDataToJSON (const char *topic, const const epsolarRealTimeData_t *
     cJSON *message = cJSON_CreateObject();
 
     cJSON_AddStringToObject( message, "topic", topic );
-    cJSON_AddStringToObject( message, "version", "3.1" );
+    cJSON_AddStringToObject( message, "version", "4.0" );
     
     //
     //  cJSON uses a "%1.15g" format for number formatting which means we can get some
@@ -122,11 +123,87 @@ char *realTimeDataToJSON (const char *topic, const const epsolarRealTimeData_t *
     cJSON_AddNumberToObject( message, "energyGeneratedTotal", FP22P( rtData->energyGeneratedTotal ) );
 
     //
+    //  New - let's see if we can pull some other data out
+    if (sendExtraData) {
+        cJSON_AddNumberToObject( message, "BatteryRealRatedVoltage", FP22P(eps_getBatteryRealRatedVoltage() ) );
+        uint16_t bits = eps_getBatteryStatusBits();
+
+        cJSON_AddStringToObject( message, "BatteryRatedVoltageCode", eps_getBatteryRatedVoltageCode() );
+        cJSON_AddStringToObject( message, "BatteryStatusInnerResistance", eps_getBatteryStatusInnerResistance( bits ) );
+        cJSON_AddStringToObject( message, "BatteryStatusIdentification", eps_getBatteryStatusIdentification( bits ) );
+
+        bits = eps_getChargingEquipmentStatusBits();
+        cJSON_AddStringToObject( message, "ChargingEquipmentStatusInputVoltageStatus", eps_getChargingEquipmentStatusInputVoltageStatus( bits ) );
+        cJSON_AddStringToObject( message, "ChargingEquipmentStatusInputVoltageStatus", eps_getChargingEquipmentStatusInputVoltageStatus( bits ) );
+
+
+        cJSON_AddBoolToObject( message, "isChargingMOSFETShorted", isChargingMOSFETShorted( bits ) );
+        cJSON_AddBoolToObject( message, "isChargingMOSFETOpen", isChargingMOSFETOpen( bits ) );
+        cJSON_AddBoolToObject( message, "isAntiReverseMOSFETShort", isAntiReverseMOSFETShort( bits ) );
+        cJSON_AddBoolToObject( message, "isInputOverCurrent", isInputOverCurrent( bits ) );
+        cJSON_AddBoolToObject( message, "isLoadOverCurrent", isLoadOverCurrent( bits ) );
+        cJSON_AddBoolToObject( message, "isLoadShorted", isLoadShorted( bits ) );
+        cJSON_AddBoolToObject( message, "isLoadMOSFETShorted", isLoadMOSFETShorted( bits ) );
+        cJSON_AddBoolToObject( message, "isDisequilibriumInThreeCircuits", isDisequilibriumInThreeCircuits( bits ) );
+        cJSON_AddBoolToObject( message, "isPVInputShorted", isPVInputShorted( bits ) );
+
+        bits = eps_getDischargingEquipmentStatusBits();
+        cJSON_AddBoolToObject( message, "isDischargeStatusShorted", isDischargeStatusShorted( bits ) );
+        cJSON_AddBoolToObject( message, "isDischargeStatusUnableToDischarge", isDischargeStatusUnableToDischarge( bits ) );
+        cJSON_AddBoolToObject( message, "isDischargeStatusUnableToStopDischarge", isDischargeStatusUnableToStopDischarge( bits ) );
+        cJSON_AddBoolToObject( message, "isDischargeStatusOutputVoltageAbnormal", isDischargeStatusOutputVoltageAbnormal( bits ) );
+        cJSON_AddBoolToObject( message, "isDischargeStatusInputOverVoltage", isDischargeStatusInputOverVoltage( bits ) );
+        cJSON_AddBoolToObject( message, "isDischargeStatusShortedInHighVoltage", isDischargeStatusShortedInHighVoltage( bits ) );
+        cJSON_AddBoolToObject( message, "isDischargeStatusBoostOverVoltage", isDischargeStatusBoostOverVoltage( bits ) );
+        cJSON_AddBoolToObject( message, "isPVisDischargeStatusOutputOverVoltageInputShorted", isDischargeStatusOutputOverVoltage( bits ) );
+        cJSON_AddBoolToObject( message, "isDischargeStatusNormal", isDischargeStatusNormal( bits ) );
+        cJSON_AddBoolToObject( message, "isDischargeStatusRunning", isDischargeStatusRunning( bits ) );
+
+
+        cJSON_AddNumberToObject( message, "RatedChargingCurrent", FP22P(eps_getRatedChargingCurrent() ) );
+        cJSON_AddNumberToObject( message, "RatedLoadCurrent", FP22P(eps_getRatedLoadCurrent() ) );
+
+        cJSON_AddNumberToObject( message, "BoostDuration", eps_getBoostDuration() );
+        cJSON_AddNumberToObject( message, "EqualizeDuration", eps_getEqualizeDuration() );
+
+
+        cJSON_AddNumberToObject( message, "RatedChargingCurrent", FP22P(eps_getRatedChargingCurrent() ) );
+        cJSON_AddStringToObject( message, "BatteryType", eps_getBatteryType() );
+        cJSON_AddNumberToObject( message, "BatteryCapacity", eps_getBatteryCapacity() );
+
+        cJSON_AddNumberToObject( message, "HighVoltageDisconnect", FP22P(eps_getHighVoltageDisconnect() ) );
+        cJSON_AddNumberToObject( message, "ChargingLimitVoltage", FP22P(eps_getChargingLimitVoltage() ) );
+        cJSON_AddNumberToObject( message, "OverVoltageReconnect", FP22P(eps_getOverVoltageReconnect() ) );
+
+        cJSON_AddNumberToObject( message, "EqualizationVoltage", FP22P(eps_getEqualizationVoltage() ) );
+        cJSON_AddNumberToObject( message, "BoostingVoltage", FP22P(eps_getBoostingVoltage() ) );
+        cJSON_AddNumberToObject( message, "FloatingVoltage", FP22P(eps_getFloatingVoltage() ) );
+        cJSON_AddNumberToObject( message, "BoostReconnectVoltage", FP22P(eps_getBoostReconnectVoltage() ) );
+
+        cJSON_AddNumberToObject( message, "LowVoltageReconnectVoltage", FP22P(eps_getLowVoltageReconnectVoltage() ) );
+        cJSON_AddNumberToObject( message, "UnderVoltageWarningRecoverVoltage", FP22P(eps_getUnderVoltageWarningRecoverVoltage() ) );
+        cJSON_AddNumberToObject( message, "UnderVoltageWarningVoltage", FP22P(eps_getUnderVoltageWarningVoltage() ) );
+        cJSON_AddNumberToObject( message, "LowVoltageDisconnectVoltage", FP22P(eps_getLowVoltageDisconnectVoltage() ) );
+        cJSON_AddNumberToObject( message, "DischargingLimitVoltage", FP22P(eps_getDischargingLimitVoltage() ) );
+
+        cJSON_AddNumberToObject( message, "DischargingPercentage", FP22P(eps_getDischargingPercentage() ) );
+        cJSON_AddNumberToObject( message, "ChargingPercentage", FP22P(eps_getChargingPercentage() ) );
+
+        cJSON_AddNumberToObject( message, "BatteryTemperatureWarningUpperLimit", FP22P(eps_getBatteryTemperatureWarningUpperLimit() ) );
+        cJSON_AddNumberToObject( message, "BatteryTemperatureWarningLowerLimit", FP22P(eps_getBatteryTemperatureWarningLowerLimit() ) );
+
+        cJSON_AddNumberToObject( message, "ControllerInnerTemperatureUpperLimit", FP22P(eps_getControllerInnerTemperatureUpperLimit() ) );
+        cJSON_AddNumberToObject( message, "ControllerInnerTemperatureUpperLimitRecover", FP22P(eps_getControllerInnerTemperatureUpperLimitRecover() ) );
+        cJSON_AddNumberToObject( message, "BatteryTemperatureWarningLowerLimit", FP22P(eps_getBatteryTemperatureWarningLowerLimit() ) );
+    }
+    
+    //
     //  From the cJSON notes: Important: If you have added an item to an array 
     //  or an object already, you mustn't delete it with cJSON_Delete. Adding 
     //  it to an array or object transfers its ownership so that when that 
     //  array or object is deleted, it gets deleted as well.
-    char *string = cJSON_Print( message );
+    //char *string = cJSON_Print( message );
+    char *string = cJSON_PrintUnformatted( message );
     cJSON_Delete( message );
     
     return string;
