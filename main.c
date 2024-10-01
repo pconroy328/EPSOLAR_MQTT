@@ -25,7 +25,7 @@
 
 
 
-static  char    *version = "EPSOLAR_MQTT SCC Data Publisher - version 0.9 (unformatted json, extra fields)";
+static  char    *version = "EPSOLAR_MQTT SCC Data Publisher - version 1 (using port cmd line)";
 
 
 static  int     sleepSeconds = 60;                  // How often to send out SCC data packets
@@ -65,9 +65,9 @@ int main (int argc, char* argv[])
     
     //
     //  Connect to the EPSolar Solar Charge Controller
-    //  Pass in NULL to use default port defined in libepsolar/epsolar.c
+    
     //  Second parmeter is Modbus Slave ID.  '1' is fine
-    if (!epsolarModbusConnect( NULL, 1 )) {
+    if (!epsolarModbusConnect( devicePortName, 1 )) {
         Logger_LogFatal( "Unable to open default device port %s to connect to the solar charge controller\n", epsolarGetDefaultPortName() );
         return( EXIT_FAILURE );
     }
