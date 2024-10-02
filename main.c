@@ -25,7 +25,7 @@
 
 
 
-static  char    *version = "EPSOLAR_MQTT SCC Data Publisher - version 1 (using port cmd line)";
+static  char    *version = "EPSOLAR_MQTT SCC Data Publisher - version 1.0.1 (using port cmd line)";
 
 
 static  int     sleepSeconds = 60;                  // How often to send out SCC data packets
@@ -60,8 +60,10 @@ int main (int argc, char* argv[])
     
     parseCommandLine( argc, argv );
     Logger_Initialize( "/tmp/epsolar_mqtt.log", loggingLevel );           
-    Logger_LogWarning( "%s\n", version );
-
+    Logger_LogWarning( "EPSOLAR_MQTT version: [%s]\n", version );
+    Logger_LogWarning( "  libepsolar version: [%s]\n", epsolarGetVersion() );
+    Logger_LogWarning( "  libmodbus version: [%s]\n", LIBMODBUS_VERSION_STRING );
+    Logger_LogWarning( "  libmqttrv version: [%s]\n", MQTT_GetLibraryVersion() );
     
     //
     //  Connect to the EPSolar Solar Charge Controller
